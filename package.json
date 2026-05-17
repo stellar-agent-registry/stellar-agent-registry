@@ -1,0 +1,40 @@
+{
+  "name": "stellar-agent-registry",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-Chain Agent Discovery & Reputation SDK for Stellar/Soroban",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "dev": "npm run dev --workspace=apps/demo",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "stellar",
+    "soroban",
+    "sdk",
+    "ai-agents",
+    "web3",
+    "blockchain",
+    "registry",
+    "x402"
+  ],
+  "author": "stellar-agent-registry contributors",
+  "license": "MIT"
+}
