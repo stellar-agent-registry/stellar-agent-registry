@@ -15,11 +15,18 @@ export type {
   LookupResult,
   MPPConfig,
   NetworkPassphrase,
+  PayOptions,
+  PayResult,
   PricingModel,
   RegistryConfig,
   ReputationResult,
   TxResult,
   X402Config,
+} from "./types/index.js";
+
+export {
+  X402AssetNotSupportedError,
+  X402PaymentError,
 } from "./types/index.js";
 
 export {

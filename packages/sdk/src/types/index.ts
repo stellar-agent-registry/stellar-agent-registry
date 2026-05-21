@@ -108,6 +108,8 @@ export interface ReputationResult {
 export interface RegistryConfig {
   /** Soroban RPC endpoint */
   rpcUrl: string;
+  /** Horizon endpoint used for direct Stellar payments (default: Testnet Horizon) */
+  horizonUrl?: string;
   /** Network passphrase */
   networkPassphrase: NetworkPassphrase;
   /** Deployed registry contract address */
@@ -151,4 +153,38 @@ export interface TxResult {
   ledger: number;
   /** Whether the transaction succeeded */
   success: boolean;
+}
+
+/** Options for paying an agent that advertises x402 payment support */
+export interface PayOptions {
+  /** Stellar asset code to pay with (for example: XLM, USDC) */
+  assetCode: string;
+  /** Atomic amount to send. For Stellar assets this is formatted with 7 decimals. */
+  amount: bigint;
+  /** Optional Stellar memo to attach to the payment transaction */
+  memo?: string;
+}
+
+/** Result from a registry-assisted x402 payment */
+export interface PayResult extends TxResult {
+  /** x402 endpoint discovered from the agent record */
+  endpoint: string;
+}
+
+export class X402PaymentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "X402PaymentError";
+  }
+}
+
+export class X402AssetNotSupportedError extends X402PaymentError {
+  constructor(agentId: string, assetCode: string, supportedAssets: string[]) {
+    super(
+      `Agent "${agentId}" does not support ${assetCode}. Supported assets: ${
+        supportedAssets.length > 0 ? supportedAssets.join(", ") : "none"
+      }`
+    );
+    this.name = "X402AssetNotSupportedError";
+  }
 }
