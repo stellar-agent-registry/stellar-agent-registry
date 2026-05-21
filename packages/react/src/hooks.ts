@@ -79,6 +79,7 @@ export function useAgent({
       const timer = setInterval(fetch, refreshInterval);
       return () => clearInterval(timer);
     }
+    return undefined;
   }, [fetch, refreshInterval]);
 
   return { agent, reputation, loading, error, refetch: fetch };

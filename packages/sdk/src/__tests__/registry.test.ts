@@ -1,12 +1,16 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { AgentRegistry } from "../src/registry.js";
-import type { AgentRegistration } from "../src/types/index.js";
+import { AgentRegistry } from "../registry.js";
+import {
+  X402AssetNotSupportedError,
+  X402PaymentError,
+} from "../types/index.js";
+import type { AgentRegistration } from "../types/index.js";
 
 const VALID_AGENT: AgentRegistration = {
   agentId: "test-agent",
   name: "Test Agent",
   description: "A test agent for unit tests",
-  ownerAddress: "GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN",
+  ownerAddress: "GCITHKQZIRJQUIEQUNEXCDMK243IXOY25PRR3BKF4ZEYQBJE2TSXVNXM",
   capabilities: [
     { id: "text-summarize", description: "Summarises long text" },
     { id: "sentiment-analysis", description: "Detects sentiment in text" },
@@ -145,6 +149,49 @@ describe("AgentRegistry (mock mode)", () => {
 
     it("throws for unknown agent", async () => {
       await expect(registry.verify("ghost-agent")).rejects.toThrow(/not found/);
+    });
+  });
+
+  describe("pay()", () => {
+    beforeEach(async () => {
+      await registry.register(VALID_AGENT);
+      await registry.register({
+        ...VALID_AGENT,
+        agentId: "free-agent",
+        pricingModel: "free",
+        x402: undefined,
+      });
+    });
+
+    it("returns a mock payment result for an x402 agent", async () => {
+      const result = await registry.pay("test-agent", {
+        assetCode: "USDC",
+        amount: 100_000n,
+        memo: "agent-call:test-agent",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.endpoint).toBe("https://agent.example.com/pay");
+      expect(result.txHash).toBe("mock_pay_test-agent_USDC_100000");
+      expect(result.ledger).toBeGreaterThan(0);
+    });
+
+    it("throws when the agent has no x402 config", async () => {
+      await expect(
+        registry.pay("free-agent", { assetCode: "USDC", amount: 100_000n })
+      ).rejects.toThrow(X402PaymentError);
+    });
+
+    it("throws when the requested asset is not supported", async () => {
+      await expect(
+        registry.pay("test-agent", { assetCode: "XLM", amount: 100_000n })
+      ).rejects.toThrow(X402AssetNotSupportedError);
+    });
+
+    it("throws when the amount is zero", async () => {
+      await expect(
+        registry.pay("test-agent", { assetCode: "USDC", amount: 0n })
+      ).rejects.toThrow(/greater than zero/);
     });
   });
 

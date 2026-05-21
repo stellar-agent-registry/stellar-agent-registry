@@ -33,9 +33,10 @@ import { validateRegistration, withRetry } from "../utils/index.js";
 export class SorobanContractClient {
   private readonly server: SorobanRpc.Server;
   private readonly contract: Contract;
-  private readonly config: Required<
-    Omit<RegistryConfig, "signerKeypair"> & { signerKeypair?: Keypair }
-  >;
+  private readonly config: Omit<RegistryConfig, "signerKeypair" | "timeoutMs"> & {
+    signerKeypair?: Keypair;
+    timeoutMs: number;
+  };
 
   constructor(config: RegistryConfig) {
     this.config = {

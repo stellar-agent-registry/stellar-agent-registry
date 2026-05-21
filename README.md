@@ -54,7 +54,7 @@ await registry.register({
   pricingModel: "per-call",
   x402: {
     endpoint: "https://my-agent.example.com/pay",
-    assets: ["USDC"],
+    assets: ["USDC:GA5ZSEJYB37WZY..."],
     pricePerCall: 100_000n, // 0.01 USDC in stroops
   },
 });
@@ -65,6 +65,15 @@ const { agents } = await registry.lookup({
   requireX402: true,
   minScore: 60,
 });
+
+// Pay a discovered x402 agent (mock mode simulates the transaction; production
+// submits a Stellar payment operation through Horizon to the agent owner).
+const payment = await registry.pay("my-ai-agent", {
+  assetCode: "USDC",
+  amount: 100_000n,
+  memo: "agent-call:my-ai-agent",
+});
+console.log(payment.txHash, payment.endpoint);
 
 // Score an agent
 await registry.score({ agentId: "my-ai-agent", score: 5, comment: "Fast and accurate" });
@@ -103,6 +112,13 @@ Submit a reputation score (1–5) and optional comment for an agent. Scores are 
 
 ### `registry.verify(agentId)`
 Mark an agent as verified (requires DAO/admin signing key).
+
+### `registry.pay(agentId, options)`
+Look up the agent's advertised `x402.endpoint` and supported assets, validate
+the requested asset, then either return a mock transaction result or submit a
+Stellar payment through Horizon. Non-native production assets should be listed
+as `CODE:ISSUER` in `x402.assets` so the SDK can construct the correct Stellar
+`Asset`.
 
 ### `registry.getAgent(agentId)`
 Fetch a single `AgentRecord` by ID.

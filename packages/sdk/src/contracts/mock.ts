@@ -93,6 +93,10 @@ export class MockContractClient {
     const agent = this.agents.get(feedback.agentId);
     if (!agent) throw new Error(`Agent "${feedback.agentId}" not found`);
 
+    if (feedback.score < 1 || feedback.score > 5) {
+      throw new Error("score must be between 1 and 5");
+    }
+
     const store = this.feedback.get(feedback.agentId) ?? { scores: [], comments: [] };
     store.scores.push(feedback.score);
     if (feedback.comment) store.comments.push(feedback.comment);

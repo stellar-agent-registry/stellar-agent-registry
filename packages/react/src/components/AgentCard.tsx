@@ -11,7 +11,7 @@
  */
 
 import React from "react";
-import { useAgent } from "./hooks.js";
+import { useAgent } from "../hooks.js";
 import type { AgentRegistryOptions, AgentRecord, ReputationResult } from "@stellar-agent-registry/sdk";
 
 export interface AgentCardProps {
